@@ -2,12 +2,12 @@
 // origin{} --> target{}
 //原始值   数组   对象
 //深度克隆
-function deepClone (origin, target) {
+function deepClone(origin, target) {
     var target = target || {},
         compareStr = '[object Array]';
-    for(var prop in origin){
-        if(origin.hasOwnProperty(prop)){
-            if(origin[prop] != null && typeof origin[prop] == 'object'){
+    for (var prop in origin) {
+        if (origin.hasOwnProperty(prop)) {
+            if (origin[prop] != null && typeof origin[prop] == 'object') {
                 target[prop] = Object.prototype.toString.call(origin[prop]) == compareStr ? [] : {};
                 deepClone(target[prop], origin[prop]);
                 // if(Object.prototype.toString.call(origin[prop]) == '[object Array]'){
@@ -20,25 +20,25 @@ function deepClone (origin, target) {
             } else {
                 target[prop] = origin[prop];
             }
-        }      
+        }
     }
     return target;
 }
 // []-->'array', {}--> 'object', null-->'null',
 //new Number... --> '[object Number]'...其他与typeof一样
-function myTypeof (arg) {
+function myTypeof(arg) {
     var res = undefined;
-    if(typeof arg == 'object'){//array obj null 
-        if(Object.prototype.toString.call(arg) == '[object Array]'){
+    if (typeof arg == 'object') {//array obj null 
+        if (Object.prototype.toString.call(arg) == '[object Array]') {
             res = 'array';
-        }else if(Object.prototype.toString.call(arg) == '[object Object]'){
+        } else if (Object.prototype.toString.call(arg) == '[object Object]') {
             res = 'object';
-        }else if(arg == null){
+        } else if (arg == null) {
             res = 'null';
-        }else{
+        } else {
             res = Object.prototype.toString.call(arg);
         }
-    }else{
+    } else {
         res = typeof arg;
     }
     return res;
@@ -50,23 +50,23 @@ Array.prototype.unique = function () {
     var newArr = [];
     var len = this.length;
     var i = 0;
-    while(i < len){
-        if(!obj[this[i]]){
+    while (i < len) {
+        if (!obj[this[i]]) {
             obj[this[i]] = 1;
             newArr.push(this[i]);
-        }else{
-            obj[this[i]] ++;
+        } else {
+            obj[this[i]]++;
         }
-        i ++;
+        i++;
     }
-   return newArr;
+    return newArr;
 }
 // var arr = [1,2,3,1,2,3, 'a', 'c', 'a'];
 // var a = arr.unique();
 
 //继承：圣杯模式 自己原型加属性不影响继承的原型
 var inherit = (function () {
-    var F = function () {};
+    var F = function () { };
     return function (target, origin) {
         F.prototype = origin.prototype;
         target.prototype = new F();
@@ -97,23 +97,23 @@ Element.prototype.traverse = function () {
 //返回元素e的第n层祖先元素节点
 function retAncstor(elem, n) {
     var ans = elem;
-    while(ans && n){
+    while (ans && n) {
         ans = ans.parentElement;
-        n --;
+        n--;
     }
     return ans;
 }
 
 //返回元素e的第n个兄弟元素节点，n为正，返回后面的兄弟元素节点，n为负，返回前面的，n为0，返回自己
 function getSiblings(elem, n) {
-    while(elem && n){
-        if(n > 0){
+    while (elem && n) {
+        if (n > 0) {
             elem = elem.nextSibling;
-            n --;
-        }else if(n < 0){
+            n--;
+        } else if (n < 0) {
             elem = elem.previousElementSibling;
-            n ++;
-        }else {
+            n++;
+        } else {
             return elem;
         }
     }
@@ -123,10 +123,42 @@ function getSiblings(elem, n) {
 //封装insertAfter
 Element.prototype.insertAfter = function (targetNode, afterNode) {
     var beforeNode = afterNode.nextElementSibling;
-    if(beforeNode == null){
+    if (beforeNode == null) {
         this.appendChild(targetNode);
-    }else{
+    } else {
         this.insertBefore(targetNode, afterNode);
     }
 }
 //将目标节点内部节点顺序逆序
+
+
+
+
+//优化网络请求-1： 节流
+//场景： 窗口调整(resize)  页面滚动(scroll)  抢购疯狂点击(mousedown)
+//wait: 等待时间    handler:处理函数
+function throttle (handler, wait) {
+    var lastTime = 0;
+    return function (e) {
+        var nowTime = new Date().getTime();
+        if(nowTime - lastTime > wait) {
+            handler.apply(this, arguments);
+            lastTime = nowTime;
+        }
+    }
+}
+
+//优化网络请求-2：防抖
+//场景：实时搜索 拖拽
+//调用实例： oInput.oninput = debounce(handler, 1000);
+function debounce (handler, delay) {
+    var timer = null;
+    return function (e) {
+        var _self = this,
+            _args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout( function () {
+            handler.apply(_self, _args);
+        }, delay);
+    }
+}
